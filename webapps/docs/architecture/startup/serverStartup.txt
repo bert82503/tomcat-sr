@@ -1,138 +1,124 @@
-  Licensed to the Apache Software Foundation (ASF) under one or more
-  contributor license agreements.  See the NOTICE file distributed with
-  this work for additional information regarding copyright ownership.
-  The ASF licenses this file to You under the Apache License, Version 2.0
-  (the "License"); you may not use this file except in compliance with
-  the License.  You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+Tomcat 5 Startup Sequence (Tomcat服务器启动顺序)
 
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
-
-Tomcat 5 Startup Sequence
-
-Sequence 1. Start from Command Line
+Sequence 1. Start from Command Line (从命令行启动)
 Class: org.apache.catalina.startup.Bootstrap
 What it does:
-    a) Set up classloaders
+    a) Set up classloaders (设置共享、服务器的类加载器)
         commonLoader (common)-> System Loader
         sharedLoader (shared)-> commonLoader -> System Loader
-        catalinaLoader(server) -> commonLoader -> System Loader
-    b) Load startup class (reflection)
+        catalinaLoader (server) -> commonLoader -> System Loader
+    b) Load startup class (reflection) (加载启动类)
         org.apache.catalina.startup.Catalina
         setParentClassloader -> sharedLoader
-        Thread.contextClassloader -> catalinaLoader
+        Thread.contextClassloader -> catalinaLoader (线程上下文加载器)
     c) Bootstrap.daemon.init() complete
 
-Sequence 2. Process command line argument (start, startd, stop, stopd)
+Sequence 2. Process command line argument (start, startd, stop, stopd) (处理命令行参数)
 Class: org.apache.catalina.startup.Bootstrap (assume command->start)
 What it does:
     a) Catalina.setAwait(true);
-    b) Catalina.load()
-        b1) initDirs() -> set properties like
-                          catalina.home
+    b) Catalina.load() (加载Catalina服务器)
+        b1) initDirs() -> set properties like (设置属性)
+                          catalina.home ($CATALINA_HOME)
                           catalina.base == catalina.home (most cases)
         b2) initNaming
             setProperty(javax.naming.Context.INITIAL_CONTEXT_FACTORY,
                     org.apache.naming.java.javaURLContextFactory ->default)
         b3) createStartDigester()
             Configures a digester for the main server.xml elements like
-            org.apache.catalina.core.StandardServer (can change of course :)
+            org.apache.catalina.core.StandardServer (标准服务器，can change of course :)
             org.apache.catalina.deploy.NamingResources
                 Stores naming resources in the J2EE JNDI tree
-            org.apache.catalina.LifecycleListener
-                implements events for start/stop of major components
-            org.apache.catalina.core.StandardService
-                The single entry for a set of connectors,
-                so that a container can listen to multiple connectors
+            org.apache.catalina.LifecycleListener (生命周期监听器)
+                implements events for start/stop of major components (实现主要组件的启动/停止事件)
+            org.apache.catalina.core.StandardService (标准服务)
+                The single entry for a set of connectors, (连接器的单一入口)
+                so that a container can listen to multiple connectors (所以，一个容器可以监听到多个连接器)
                 ie, single entry
-            org.apache.coyote.tomcat5.CoyoteConnector
-                Connectors to listen for incoming requests only
+            org.apache.coyote.tomcat5.CoyoteConnector (Coyote连接器)
+                Connectors to listen for incoming requests only (连接器仅监听进来的请求)
             It also adds the following rulesets to the digester
                 NamingRuleSet
-                EngineRuleSet
-                HostRuleSet
-                ContextRuleSet
-        b4) Load the server.xml and parse it using the digester
-            Parsing the server.xml using the digester is an automatic
+                EngineRuleSet (引擎规则集)
+                HostRuleSet (主机规则集)
+                ContextRuleSet (上下文规则集)
+        b4) Load the server.xml and parse it using the digester (加载server.xml文件，并使用消化器解析它)
+            Parsing the server.xml using the digester is an automatic (自动解析server.xml文件)
             XML-object mapping tool, that will create the objects defined in server.xml
-            Startup of the actual container has not started yet.
+            Startup of the actual container has not started yet. (启动实际的容器)
         b5) Assigns System.out and System.err to the SystemLogHandler class
         b6) Calls initialize on all components, this makes each object register itself with the
-            JMX agent.
+            JMX agent. (调用初始化所有组件)
             During the process call the Connectors also initialize the adapters.
-            The adapters are the components that do the request pre-processing.
+            The adapters are the components that do the request pre-processing. (适配器是请求的预处理组件)
             Typical adapters are HTTP1.1 (default if no protocol is specified,
-            org.apache.coyote.http11.Http11Protocol)
+            org.apache.coyote.http11.Http11Protocol) (默认使用"HTTP1.1"协议，实例化阻塞的Http11Protocol)
             AJP1.3 for mod_jk etc.
 
-    c) Catalina.start()
+    c) Catalina.start() (启动Catalina服务器)
         c1) Starts the NamingContext and binds all JNDI references into it
-        c2) Starts the services under <Server> which are:
-            StandardService -> starts Engine (ContainerBase ->Logger,Loader,Realm,Cluster etc)
-        c3) StandardHost (started by the service)
+        c2) Starts the services under <Server> which are: (启动服务)
+            StandardService -> starts Engine (ContainerBase ->Logger,Loader,Realm,Cluster etc) (启动引擎)
+        c3) StandardHost (started by the service) (标准主机)
                 Configures a ErrorReportValvem to do proper HTML output for different HTTP
                 errors codes
-                Starts the Valves in the pipeline (at least the ErrorReportValve)
-                Configures the StandardHostValve,
-                    this valves ties the Webapp Class loader to the thread context
-                    it also finds the session for the request
-                    and invokes the context pipeline
-                Starts the HostConfig component
-                    This component deploys all the webapps
+                Starts the Valves in the pipeline (at least the ErrorReportValve) (在管道中启动阀门)
+                Configures the StandardHostValve, (配置标准主机阀门)
+                    this valves ties the Webapp Class loader to the thread context (绑定Web应用类加载器到线程上下文)
+                    it also finds the session for the request (查找请求的会话)
+                    and invokes the context pipeline (调用上下文管道)
+                Starts the HostConfig component (启动主机配置组件)
+                    This component deploys all the webapps (部署所有的web应用)
                         (webapps & conf/Catalina/localhost/*.xml)
-                    Webapps are installed using the deployer (StandardHostDeployer)
+                    Webapps are installed using the deployer (StandardHostDeployer) (使用标准主机部署器来安装web应用)
                     The deployer will create a Digester for your context, this digester
-                    will then invoke ContextConfig.start()
-                        The ContextConfig.start() will process the default web.xml (conf/web.xml)
-                        and then process the applications web.xml (WEB-INF/web.xml)
+                    will then invoke ContextConfig.start() (启动上下文配置)
+                        The ContextConfig.start() will process the default web.xml (conf/web.xml) (先处理默认的conf/web.xml文件)
+                        and then process the applications web.xml (WEB-INF/web.xml) (然后处理应用的WEB-INF/web.xml文件)
 
         c4) During the lifetime of the container (StandardEngine) there is a background thread that
             keeps checking if the context has changed. If a context changes (timestamp of war file,
-            context xml file, web.xml) then a reload is issued (stop/remove/deploy/start)
+            context xml file, web.xml) then a reload is issued (stop/remove/deploy/start) (在容器[标准引擎]的生存期内，一个后台线程会不断检查上下文是否改变)
 
-    d) Tomcat receives a request on an HTTP port
+    d) Tomcat receives a request on an HTTP port (Tomcat接收一个HTTP端口上的请求)
         d1) The request is received by a separate thread which is waiting in the PoolTcpEndPoint
-             class. It is waiting for a request in a regular ServerSocket.accept() method.
-             When a request is received, this thread wakes up.
-        d2) The PoolTcpEndPoint assigns the a TcpConnection to handle the request.
+             class. It is waiting for a request in a regular ServerSocket.accept() method. (用一个守候在PoolTcpEndPoint的独立线程来接收请求，等待ServerSocket.accept()方法调用)
+             When a request is received, this thread wakes up. (当接收到一个请求时，该线程就会被唤醒)
+        d2) The PoolTcpEndPoint assigns a TcpConnection to handle the request. (PoolTcpEndPoint分配一个TcpConnection来处理这个请求)
             It also supplies a JMX object name to the catalina container (not used I believe)
         d3) The processor to handle the request in this case is Coyote Http11Processor,
-            and the process method is invoked.
+            and the process method is invoked. (Http11Processor处理器来处理这个请求，同时process方法被调用)
             This same processor is also continuing to check the input stream of the socket
             until the keep alive point is reached or the connection is disconnected.
-        d4) The HTTP request is parsed using an internal buffer class (Coyote Http11 Internal Buffer)
+        d4) The HTTP request is parsed using an internal buffer class (Coyote Http11 Internal Buffer) (使用内部缓冲区类来解析HTTP请求)
             The buffer class parses the request line, the headers, etc and store the result in a
             Coyote request (not an HTTP request) This request contains all the HTTP info, such
-            as servername, port, scheme, etc.
+            as servername, port, scheme, etc. (缓冲区类解析请求行、头信息等，并存储结果到Coyote请求中)
         d5) The processor contains a reference to an Adapter, in this case it is the
             Coyote Tomcat 5 Adapter. Once the request has been parsed, the Http11 processor
             invokes service() on the adapter. In the service method, the Request contains a
-            CoyoteRequest and CoyoteRespons (null for the first time)
+            CoyoteRequest and CoyoteResponse (null for the first time)
             The CoyoteRequest(Response) implements HttpRequest(Response) and HttpServletRequest(Response)
             The adapter parses and associates everything with the request, cookies, the context through a
             Mapper, etc
         d6) When the parsing is finished, the CoyoteAdapter invokes its container (StandardEngine)
-            and invokes the invoke(request,response) method.
-            This initiates the HTTP request into the Catalina container starting at the engine level
+            and invokes the invoke(request, response) method. (当解析完成后，CoyoteAdapter调用其容器。StandardEngine.invoke(request, response))
+            This initiates the HTTP request into the Catalina container starting at the engine level (在Catalina容器中启动HTTP请求)
         d7) The StandardEngine.invoke() simply invokes the container pipeline.invoke()
         d8) By default the engine only has one valve the StandardEngineValve, this valve simply
-            invokes the invoke() method on the Host pipeline (StandardHost.getPipeLine())
-        d9) the StandardHost has two valves by default, the StandardHostValve and the ErrorReportValve
-        d10) The standard host valve associates the correct class loader with the current thread
+            invokes the invoke() method on the Host pipeline (StandardHost.getPipeLine()) (默认情况下，引擎仅包含一个StandardEngineValve阀门。StandardHost.getPipeLine().invoke())
+        d9) the StandardHost has two valves by default, the StandardHostValve and the ErrorReportValve (StandardHost默认含有2个阀门，StandardHostValve和ErrorReportValve)
+        d10) The standard host valve associates the correct class loader with the current thread (标准主机阀门关联到当前线程的类加载器)
              It also retrieves the Manager and the session associated with the request (if there is one)
-             If there is a session access() is called to keep the session alive
+             If there is a session access() is called to keep the session alive (检索该请求相关联的会话信息)
         d11) After that the StandardHostValve invokes the pipeline on the context associated
              with the request.
         d12) The first valve that gets invoked by the Context pipeline is the FormAuthenticator
              valve. Then the StandardContextValve gets invoke.
-             The StandardContextValve invokes any context listeners associated with the context.
+             The StandardContextValve invokes any context listeners associated with the context. (StandardContextValve调用所有关联到该上下文的上下文监听器)
              Next it invokes the pipeline on the Wrapper component (StandardWrapperValve)
         d13) During the invocation of the StandardWrapperValve, the JSP wrapper (Jasper) gets invoked
              This results in the actual compilation of the JSP.
-             And then invokes the actual servlet.
-    e) Invocation of the servlet class
+             And then invokes the actual servlet. (然后调用实际的servlet)
+    e) Invocation of the servlet class (调用servlet类)
