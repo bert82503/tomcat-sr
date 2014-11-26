@@ -56,15 +56,19 @@ import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
 
 /**
+ * 非阻塞的定制线程池，提供以下服务：
+ * <br>
  * NIO tailored thread pool, providing the following services:
  * <ul>
- * <li>Socket acceptor thread</li>
- * <li>Socket poller thread</li>
- * <li>Worker threads pool</li>
+ * <li>Socket acceptor thread (套接字接收者线程)</li>
+ * <li>Socket poller thread (套接字轮询者线程)</li>
+ * <li>Worker threads pool (工作者线程池)</li>
  * </ul>
  *
  * When switching to Java 5, there's an opportunity to use the virtual
  * machine's thread pool.
+ * <br>
+ * 当切换到Java 5，有机会使用Java虚拟机的线程池。
  *
  * @author Mladen Turk
  * @author Remy Maucherat
@@ -125,29 +129,36 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
     /**
      * Cache for SocketProcessor objects
+     * <br>
+     * "套接字处理器"列表的队列缓存
      */
     protected ConcurrentLinkedQueue<SocketProcessor> processorCache = new ConcurrentLinkedQueue<SocketProcessor>() {
         private static final long serialVersionUID = 1L;
+        
+        // "套接字处理器个数"计数器（默认是不超过 500）
         protected AtomicInteger size = new AtomicInteger(0);
+        
         @Override
         public boolean offer(SocketProcessor sc) {
-            sc.reset(null,null);
-            boolean offer = socketProperties.getProcessorCache()==-1?true:size.get()<socketProperties.getProcessorCache();
+            sc.reset(null, null);
+            boolean offer = socketProperties.getProcessorCache() == -1
+            		? true : size.get() < socketProperties.getProcessorCache();
             //avoid over growing our cache or add after we have stopped
-            if ( running && (!paused) && (offer) ) {
+            if (running && (!paused) && offer) {
                 boolean result = super.offer(sc);
-                if ( result ) {
+                if (result) {
                     size.incrementAndGet();
                 }
                 return result;
+            } else {
+            	return false;
             }
-            else return false;
         }
 
         @Override
         public SocketProcessor poll() {
             SocketProcessor result = super.poll();
-            if ( result != null ) {
+            if (result != null) {
                 size.decrementAndGet();
             }
             return result;
