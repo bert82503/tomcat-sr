@@ -64,6 +64,7 @@ public final class Bootstrap {
 
     /**
      * Daemon object used by main.
+     * 引导加载程序守护进程
      */
     private static Bootstrap daemon = null;
 
@@ -73,18 +74,25 @@ public final class Bootstrap {
 
     /**
      * Daemon reference.
+     * Catalina服务的守护进程
      */
     private Object catalinaDaemon = null;
 
 
-    protected ClassLoader commonLoader = null;
-    protected ClassLoader catalinaLoader = null;
-    protected ClassLoader sharedLoader = null;
+    /**
+     * 类加载器定义
+     */
+    protected ClassLoader commonLoader = null;		// 公共
+    protected ClassLoader catalinaLoader = null;	// Catalina服务
+    protected ClassLoader sharedLoader = null;		// 共享
 
 
     // -------------------------------------------------------- Private Methods
 
 
+    /**
+     * Startup 初始化类加载器。
+     */
     private void initClassLoaders() {
         try {
             commonLoader = createClassLoader("common", null);
@@ -101,7 +109,9 @@ public final class Bootstrap {
         }
     }
 
-
+    /**
+     * 创建一个类加载器实例。
+     */
     private ClassLoader createClassLoader(String name, ClassLoader parent)
         throws Exception {
 
@@ -111,6 +121,7 @@ public final class Bootstrap {
 
         value = replace(value);
 
+        // 1. 检索 JAR 仓库
         List<Repository> repositories = new ArrayList<Repository>();
 
         StringTokenizer tokenizer = new StringTokenizer(value, ",");
@@ -131,7 +142,7 @@ public final class Bootstrap {
                 // Ignore
             }
 
-            // Local repository
+            // Local repository (本地仓库)
             if (repository.endsWith("*.jar")) {
                 repository = repository.substring
                     (0, repository.length() - "*.jar".length());
@@ -149,7 +160,7 @@ public final class Bootstrap {
         ClassLoader classLoader = ClassLoaderFactory.createClassLoader
             (repositories, parent);
 
-        // Retrieving MBean server
+        // 2. Retrieving MBean server (检索MBean服务)
         MBeanServer mBeanServer = null;
         if (MBeanServerFactory.findMBeanServer(null).size() > 0) {
             mBeanServer = MBeanServerFactory.findMBeanServer(null).get(0);
@@ -157,7 +168,7 @@ public final class Bootstrap {
             mBeanServer = ManagementFactory.getPlatformMBeanServer();
         }
 
-        // Register the server classloader
+        // 3. Register the server classloader (注册服务的类加载器)
         ObjectName objectName =
             new ObjectName("Catalina:type=ServerClassLoader,name=" + name);
         mBeanServer.registerMBean(classLoader, objectName);
@@ -168,6 +179,7 @@ public final class Bootstrap {
 
     /**
      * System property replacement in the given string.
+     * 替换系统属性变量值。
      * 
      * @param str The original string
      * @return the modified string
@@ -214,30 +226,34 @@ public final class Bootstrap {
 
     /**
      * Initialize daemon.
+     * Startup 初始化"Catalina服务的守护进程"。
      */
     public void init()
         throws Exception
     {
 
-        // Set Catalina path
+        // 1. Set Catalina path (设置Catalina服务路径)
         setCatalinaHome();
         setCatalinaBase();
 
+        // 2. 初始化类加载器
         initClassLoaders();
 
+        // 3. 设置当前线程的上下文类加载器("Catalina服务类加载器")
         Thread.currentThread().setContextClassLoader(catalinaLoader);
 
         SecurityClassLoad.securityClassLoad(catalinaLoader);
 
-        // Load our startup class and call its process() method
+        // 4. Load our startup class and call its process() method (加载启动类Catalina，并调用process()方法)
         if (log.isDebugEnabled())
             log.debug("Loading startup class");
         Class<?> startupClass =
             catalinaLoader.loadClass
             ("org.apache.catalina.startup.Catalina");
+        // 启动实例
         Object startupInstance = startupClass.newInstance();
 
-        // Set the shared extensions class loader
+        // 5. Set the shared extensions class loader (设置共享的扩展类加载器)
         if (log.isDebugEnabled())
             log.debug("Setting startup class properties");
         String methodName = "setParentClassLoader";
@@ -249,6 +265,7 @@ public final class Bootstrap {
             startupInstance.getClass().getMethod(methodName, paramTypes);
         method.invoke(startupInstance, paramValues);
 
+        // 5. 设置"Catalina服务的守护进程"
         catalinaDaemon = startupInstance;
 
     }
