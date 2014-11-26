@@ -22,6 +22,8 @@ public interface ResizableExecutor extends Executor {
 
     /**
      * Returns the current number of threads in the pool.
+     * <br>
+     * 返回线程池中线程的当前数量。
      *
      * @return the number of threads
      */
@@ -30,8 +32,9 @@ public interface ResizableExecutor extends Executor {
     public int getMaxThreads();
 
     /**
-     * Returns the approximate number of threads that are actively executing
-     * tasks.
+     * Returns the approximate number of threads that are actively executing tasks.
+     * <br>
+     * 返回正在执行任务的线程的近似数量。
      *
      * @return the number of threads
      */
