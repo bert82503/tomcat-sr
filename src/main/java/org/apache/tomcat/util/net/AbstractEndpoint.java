@@ -337,7 +337,7 @@ public abstract class AbstractEndpoint<S> {
      */
     private int minSpareThreads = 10;
     public int getMinSpareThreads() {
-        return Math.min(minSpareThreads,getMaxThreads());
+        return Math.min(minSpareThreads, getMaxThreads());
     }
     public void setMinSpareThreads(int minSpareThreads) {
         this.minSpareThreads = minSpareThreads;
@@ -537,12 +537,16 @@ public abstract class AbstractEndpoint<S> {
     }
 
 
+    /**
+     * 默认情况下，创建基于 {@link ThreadPoolExecutor} 的执行器实例。
+     */
     public void createExecutor() {
         internalExecutor = true;
+        // 任务队列
         TaskQueue taskqueue = new TaskQueue();
         TaskThreadFactory tf = new TaskThreadFactory(getName() + "-exec-", daemon, getThreadPriority());
-        executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), 60, TimeUnit.SECONDS,taskqueue, tf);
-        taskqueue.setParent( (ThreadPoolExecutor) executor);
+        executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), 60, TimeUnit.SECONDS, taskqueue, tf);
+        taskqueue.setParent((ThreadPoolExecutor) executor);
     }
 
     public void shutdownExecutor() {
@@ -677,6 +681,11 @@ public abstract class AbstractEndpoint<S> {
         }
     }
 
+    /**
+     * Startup 启动端点。
+     *
+     * @throws Exception
+     */
     public final void start() throws Exception {
         if (bindState == BindState.UNBOUND) {
             bind();
