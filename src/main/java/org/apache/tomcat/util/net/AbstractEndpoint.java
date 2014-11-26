@@ -114,6 +114,8 @@ public abstract class AbstractEndpoint<S> {
 
     /**
      * Are we using an internal executor
+     * <br>
+     * 默认是不使用内部执行器
      */
     protected volatile boolean internalExecutor = false;
 
@@ -142,6 +144,8 @@ public abstract class AbstractEndpoint<S> {
     /**
      * Time to wait for the internal executor (if used) to terminate when the
      * endpoint is stopped in milliseconds. Defaults to 5000 (5 seconds).
+     * <br>
+     * 当端点停止运行时，内部执行器等待终止的时间（默认是 5秒）
      */
     private long executorTerminationTimeoutMillis = 5000;
 
@@ -157,6 +161,8 @@ public abstract class AbstractEndpoint<S> {
 
     /**
      * Acceptor thread count.
+     * <br>
+     * 接收者线程数（默认是 1）
      */
     protected int acceptorThreadCount = 0;
 
@@ -176,6 +182,18 @@ public abstract class AbstractEndpoint<S> {
     public int getAcceptorThreadPriority() { return acceptorThreadPriority; }
 
 
+    /**
+     * The maximum number of connections that the server will 
+     * accept and process at any given time. When this number has been reached, 
+     * the server will accept, but not process, one further connection.
+     * This additional connection be blocked until the number of connections 
+     * being processed falls below maxConnections at which point the server will 
+     * start accepting and processing new connections again. Note that once 
+     * the limit has been reached, the operating system may still accept connections 
+     * based on the acceptCount setting. The default is 10000.
+     * <br>
+     * 服务器在任意时刻能接收和处理连接的最大数量（默认是 10000 条连接）
+     */
     private int maxConnections = 10000;
     public void setMaxConnections(int maxCon) {
         this.maxConnections = maxCon;
@@ -218,11 +236,13 @@ public abstract class AbstractEndpoint<S> {
 
     /**
      * External Executor based thread pool.
+     * <br>
+     * 基于线程池的外部执行器
      */
     private Executor executor = null;
     public void setExecutor(Executor executor) {
         this.executor = executor;
-        this.internalExecutor = (executor==null);
+        this.internalExecutor = (executor == null);
     }
     public Executor getExecutor() { return executor; }
 
@@ -310,23 +330,30 @@ public abstract class AbstractEndpoint<S> {
     public void setSSLEnabled(boolean SSLEnabled) { this.SSLEnabled = SSLEnabled; }
 
 
+    /**
+     * The minimum number of threads always kept running. The default is 10.
+     * <br>
+     * 一直保持运行的线程的最小数量（默认是 10）
+     */
     private int minSpareThreads = 10;
     public int getMinSpareThreads() {
         return Math.min(minSpareThreads,getMaxThreads());
     }
     public void setMinSpareThreads(int minSpareThreads) {
         this.minSpareThreads = minSpareThreads;
-        if (running && executor!=null) {
+        if (running && executor != null) {
             if (executor instanceof java.util.concurrent.ThreadPoolExecutor) {
-                ((java.util.concurrent.ThreadPoolExecutor)executor).setCorePoolSize(minSpareThreads);
+                ((java.util.concurrent.ThreadPoolExecutor) executor).setCorePoolSize(minSpareThreads);
             } else if (executor instanceof ResizableExecutor) {
-                ((ResizableExecutor)executor).resizePool(minSpareThreads, maxThreads);
+                ((ResizableExecutor) executor).resizePool(minSpareThreads, maxThreads);
             }
         }
     }
 
     /**
      * Maximum amount of worker threads.
+     * <br>
+     * 工作者线程的最大数量（默认是 200）
      */
     private int maxThreads = 200;
     public void setMaxThreads(int maxThreads) {
@@ -358,6 +385,8 @@ public abstract class AbstractEndpoint<S> {
 
     /**
      * Max keep alive requests
+     * <br>
+     * 保持"keep-alive"请求连接的最大数量（默认是 100）
      */
     private int maxKeepAliveRequests=100; // as in Apache HTTPD server
     public int getMaxKeepAliveRequests() {
