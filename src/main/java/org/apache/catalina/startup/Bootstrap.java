@@ -226,7 +226,7 @@ public final class Bootstrap {
 
     /**
      * Initialize daemon.
-     * Startup 初始化"Catalina服务的守护进程"。
+     * 初始化"Catalina服务的守护进程"实例。
      */
     public void init()
         throws Exception
@@ -273,11 +273,12 @@ public final class Bootstrap {
 
     /**
      * Load daemon.
+     * 启动一个新的Catalina服务器实例。
      */
     private void load(String[] arguments)
         throws Exception {
 
-        // Call the load() method
+        // Call the load() method (调用load()方法)
         String methodName = "load";
         Object param[];
         Class<?> paramTypes[];
@@ -312,11 +313,12 @@ public final class Bootstrap {
     }
 
 
-    // ----------------------------------------------------------- Main Program
+    // ----------------------------------------------------------- Main Program (主程序)
 
 
     /**
      * Load the Catalina daemon.
+     * Startup 初始化一个新的"Catalina服务的守护进程"实例
      */
     public void init(String[] arguments)
         throws Exception {
