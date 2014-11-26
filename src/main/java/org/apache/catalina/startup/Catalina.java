@@ -86,7 +86,8 @@ public class Catalina {
     protected boolean await = false;
 
     /**
-     * Pathname to the server configuration file.
+     * Pathname to the server configuration file.<br>
+     * 服务器配置文件的路径名
      */
     protected String configFile = "conf/server.xml";
 
@@ -99,7 +100,8 @@ public class Catalina {
 
 
     /**
-     * The server component we are starting or stopping.
+     * The server component we are starting or stopping.<br>
+     * 启动或停止的服务器组件 <Server>
      */
     protected Server server = null;
 
@@ -148,15 +150,6 @@ public class Catalina {
 
 
     // ------------------------------------------------------------- Properties
-
-    /**
-     * @deprecated  Use {@link #setConfigFile(String)}
-     */
-    @Deprecated
-    public void setConfig(String file) {
-        configFile = file;
-    }
-
 
     public void setConfigFile(String file) {
         configFile = file;
@@ -288,7 +281,7 @@ public class Catalina {
         if (!file.isAbsolute()) {
             file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), configFile);
         }
-        return (file);
+        return file;
 
     }
 
@@ -311,6 +304,7 @@ public class Catalina {
         digester.setUseContextClassLoader(true);
 
         // Configure the actions we will be using
+        // Server(服务器)
         digester.addObjectCreate("Server",
                                  "org.apache.catalina.core.StandardServer",
                                  "className");
@@ -326,6 +320,7 @@ public class Catalina {
                             "setGlobalNamingResources",
                             "org.apache.catalina.deploy.NamingResources");
 
+        // Listener(监视器)
         digester.addObjectCreate("Server/Listener",
                                  null, // MUST be specified in the element
                                  "className");
@@ -334,6 +329,7 @@ public class Catalina {
                             "addLifecycleListener",
                             "org.apache.catalina.LifecycleListener");
 
+        // Service(服务)
         digester.addObjectCreate("Server/Service",
                                  "org.apache.catalina.core.StandardService",
                                  "className");
@@ -342,6 +338,7 @@ public class Catalina {
                             "addService",
                             "org.apache.catalina.Service");
 
+        // Service/Listener(服务监视器)
         digester.addObjectCreate("Server/Service/Listener",
                                  null, // MUST be specified in the element
                                  "className");
@@ -350,7 +347,7 @@ public class Catalina {
                             "addLifecycleListener",
                             "org.apache.catalina.LifecycleListener");
 
-        //Executor
+        // Executor(服务执行器)
         digester.addObjectCreate("Server/Service/Executor",
                          "org.apache.catalina.core.StandardThreadExecutor",
                          "className");
@@ -361,6 +358,7 @@ public class Catalina {
                             "org.apache.catalina.Executor");
 
 
+        // Service/Connector(服务连接器)
         digester.addRule("Server/Service/Connector",
                          new ConnectorCreateRule());
         digester.addRule("Server/Service/Connector",
