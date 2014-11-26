@@ -71,6 +71,7 @@ public class CatalinaProperties {
 
     /**
      * Load properties.
+     * 加载"${catalina.base}/conf/catalina.properties"配置文件
      */
     private static void loadProperties() {
 
@@ -88,6 +89,7 @@ public class CatalinaProperties {
 
         if (is == null) {
             try {
+            	// ${catalina.base}/conf/catalina.properties
                 File home = new File(getCatalinaBase());
                 File conf = new File(home, "conf");
                 File propsFile = new File(conf, "catalina.properties");
