@@ -331,24 +331,26 @@ public final class Bootstrap {
 
     /**
      * Start the Catalina daemon.
+     * Startup 启动"Catalina服务的守护进程"
      */
     public void start()
         throws Exception {
-        if( catalinaDaemon==null ) init();
+        if (catalinaDaemon == null) init();
 
-        Method method = catalinaDaemon.getClass().getMethod("start", (Class [] )null);
-        method.invoke(catalinaDaemon, (Object [])null);
+        Method method = catalinaDaemon.getClass().getMethod("start", (Class []) null);
+        method.invoke(catalinaDaemon, (Object []) null);
 
     }
 
 
     /**
      * Stop the Catalina Daemon.
+     * 终止"Catalina服务的守护进程"
      */
     public void stop()
         throws Exception {
 
-        Method method = catalinaDaemon.getClass().getMethod("stop", (Class [] ) null);
+        Method method = catalinaDaemon.getClass().getMethod("stop", (Class []) null);
         method.invoke(catalinaDaemon, (Object [] ) null);
 
     }
@@ -571,10 +573,10 @@ public final class Bootstrap {
 
     // Copied from ExceptionUtils since that class is not visible during start
     private static void handleThrowable(Throwable t) {
-        if (t instanceof ThreadDeath) {
+        if (t instanceof ThreadDeath) { // 线程卡死
             throw (ThreadDeath) t;
         }
-        if (t instanceof VirtualMachineError) {
+        if (t instanceof VirtualMachineError) { // 虚拟机错误
             throw (VirtualMachineError) t;
         }
         // All other instances of Throwable will be silently swallowed
