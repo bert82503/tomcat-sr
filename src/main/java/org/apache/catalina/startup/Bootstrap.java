@@ -64,7 +64,7 @@ public final class Bootstrap {
 
     /**
      * Daemon object used by main.
-     * 引导加载程序守护进程
+     * 引导加载程序的守护进程
      */
     private static Bootstrap daemon = null;
 
@@ -434,15 +434,18 @@ public final class Bootstrap {
     /**
      * Main method and entry point when starting Tomcat via the provided
      * scripts.
+     * 
+     * Startup 通过脚本启动Tomcat服务的主方法和入口点
      *
      * @param args Command line arguments to be processed
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
 
         if (daemon == null) {
             // Don't set daemon until init() has completed
             Bootstrap bootstrap = new Bootstrap();
             try {
+            	// 初始化"Catalina服务的守护进程"实例
                 bootstrap.init();
             } catch (Throwable t) {
                 handleThrowable(t);
