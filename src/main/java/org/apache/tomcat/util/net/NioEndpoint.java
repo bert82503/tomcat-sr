@@ -534,6 +534,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
     /**
      * Start the NIO endpoint, creating acceptor, poller threads.
+     * <br>
+     * Startup 启动非阻塞的端点，创建接收者和轮询者线程。
      */
     @Override
     public void startInternal() throws Exception {
@@ -542,8 +544,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             running = true;
             paused = false;
 
-            // Create worker collection
-            if ( getExecutor() == null ) {
+            // Create worker collection (创建工作者集合(线程池)执行器)
+            if (getExecutor() == null) {
                 createExecutor();
             }
 
