@@ -538,7 +538,7 @@ public abstract class AbstractEndpoint<S> {
 
 
     /**
-     * 默认情况下，创建基于 {@link ThreadPoolExecutor} 的执行器实例。
+     * Startup 默认情况下，创建 {@link ThreadPoolExecutor} 执行器实例。
      */
     public void createExecutor() {
         internalExecutor = true;
