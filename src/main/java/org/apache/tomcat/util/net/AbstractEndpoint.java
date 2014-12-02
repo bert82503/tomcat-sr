@@ -260,8 +260,7 @@ public abstract class AbstractEndpoint<S> {
 	}
 
 	/**
-	 * External Executor based thread pool. <br>
-	 * 基于线程池的外部执行器
+	 * External Executor based thread pool. (基于线程池的外部执行器)
 	 */
 	private Executor executor = null;
 
@@ -489,7 +488,7 @@ public abstract class AbstractEndpoint<S> {
 	}
 
 	/**
-	 * Name of the thread pool, which will be used for naming child threads.
+	 * Name of the thread pool, which will be used for naming child threads. (线程池名称)
 	 */
 	private String name = "TP";
 
@@ -517,7 +516,7 @@ public abstract class AbstractEndpoint<S> {
 	}
 
 	/**
-	 * Priority of the worker threads.
+	 * Priority of the worker threads. (工作者线程的优先级)
 	 */
 	protected int threadPriority = Thread.NORM_PRIORITY;
 
@@ -642,7 +641,7 @@ public abstract class AbstractEndpoint<S> {
 	 */
 	public void createExecutor() {
 		internalExecutor = true;
-		// 任务队列
+		// 无界的任务队列
 		TaskQueue taskqueue = new TaskQueue();
 		TaskThreadFactory tf = new TaskThreadFactory(getName() + "-exec-",
 				daemon, getThreadPriority());

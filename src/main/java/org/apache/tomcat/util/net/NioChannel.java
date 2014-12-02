@@ -40,8 +40,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class NioChannel implements ByteChannel {
 
-    protected static final StringManager sm =
-            StringManager.getManager("org.apache.tomcat.util.net.res");
+    protected static final StringManager sm = StringManager.getManager("org.apache.tomcat.util.net.res");
 
     protected static ByteBuffer emptyBuf = ByteBuffer.allocate(0);
 

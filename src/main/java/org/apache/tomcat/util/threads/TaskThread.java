@@ -21,11 +21,14 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * A Thread implementation that records the time at which it was created.
- *
+ * <p>
+ * 一个记录创建时间的任务线程。
  */
 public class TaskThread extends Thread {
 
     private static final Log log = LogFactory.getLog(TaskThread.class);
+    
+    /** 线程创建时间(ms) */
     private final long creationTime;
 
     public TaskThread(ThreadGroup group, Runnable target, String name) {
@@ -51,10 +54,14 @@ public class TaskThread extends Thread {
      * instead of letting it go and potentially trigger a break in a debugger.
      */
     private static class WrappingRunnable implements Runnable {
+
+    	/** 包装的可执行任务 */
         private Runnable wrappedRunnable;
+        
         WrappingRunnable(Runnable wrappedRunnable) {
             this.wrappedRunnable = wrappedRunnable;
         }
+        
         @Override
         public void run() {
             try {

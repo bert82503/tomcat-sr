@@ -79,7 +79,8 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
     protected boolean prestartminSpareThreads = false;
 
     /**
-     * The maximum number of elements that can queue up before we reject them
+     * The maximum number of elements that can queue up before we reject them. <br>
+     * 队列元素的最大容量（默认是 无界的）
      */
     protected int maxQueueSize = Integer.MAX_VALUE;
     
@@ -115,10 +116,10 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
      */
     @Override
     protected void startInternal() throws LifecycleException {
-
+    	// 默认是创建无界的任务队列
         taskqueue = new TaskQueue(maxQueueSize);
-        TaskThreadFactory tf = new TaskThreadFactory(namePrefix,daemon,getThreadPriority());
-        executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), maxIdleTime, TimeUnit.MILLISECONDS,taskqueue, tf);
+        TaskThreadFactory tf = new TaskThreadFactory(namePrefix, daemon, getThreadPriority());
+        executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), maxIdleTime, TimeUnit.MILLISECONDS, taskqueue, tf);
         executor.setThreadRenewalDelay(threadRenewalDelay);
         if (prestartminSpareThreads) {
             executor.prestartAllCoreThreads();
