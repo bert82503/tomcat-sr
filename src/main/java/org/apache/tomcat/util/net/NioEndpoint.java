@@ -321,7 +321,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
 
     /**
-     * Handling of accepted sockets.
+     * Handling of accepted sockets. (接收的套接字处理器)
      */
     protected Handler handler = null;
     public void setHandler(Handler handler ) { this.handler = handler; }
@@ -1666,14 +1666,18 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
     }
 
 
-    // ---------------------------------------------- SocketProcessor Inner Class
+    // ---------------------------------------------- SocketProcessor Inner Class ("套接字处理器"内部类)
     /**
      * This class is the equivalent of the Worker, but will simply use in an
      * external Executor thread pool.
+     * <p>
+     * "套接字处理器"等价于工作者线程(Worker)，但仅会在外部执行器线程池中简单使用。
      */
     protected class SocketProcessor implements Runnable {
 
+    	/** 非阻塞通道 */
         protected NioChannel socket = null;
+        /** 套接字状态 */
         protected SocketStatus status = null;
 
         public SocketProcessor(NioChannel socket, SocketStatus status) {
@@ -1712,6 +1716,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
         private void doRun(SelectionKey key, KeyAttachment ka) {
             try {
+            	// 握手
                 int handshake = -1;
 
                 try {
