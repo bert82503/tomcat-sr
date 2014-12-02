@@ -18,6 +18,9 @@ package org.apache.tomcat.util.threads;
 
 import java.util.concurrent.Executor;
 
+/**
+ * "基于并发执行器({@link Executor})的可变大小执行器"接口
+ */
 public interface ResizableExecutor extends Executor {
 
     /**
@@ -29,6 +32,11 @@ public interface ResizableExecutor extends Executor {
      */
     public int getPoolSize();
 
+    /**
+     * 返回该线程池能持有的最大线程数。
+     * 
+     * @return
+     */
     public int getMaxThreads();
 
     /**
@@ -40,8 +48,21 @@ public interface ResizableExecutor extends Executor {
      */
     public int getActiveCount();
 
+    /**
+     * 调整线程池的核心线程数和最大线程数。
+     * 
+     * @param corePoolSize 核心线程数
+     * @param maximumPoolSize 最大线程数
+     * @return
+     */
     public boolean resizePool(int corePoolSize, int maximumPoolSize);
 
+    /**
+     * 调整任务工作(阻塞)队列的容量。
+     * 
+     * @param capacity
+     * @return
+     */
     public boolean resizeQueue(int capacity);
 
 }
