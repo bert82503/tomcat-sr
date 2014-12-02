@@ -20,15 +20,24 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Simple task thread factory to use to create threads for an executor implementation.
+ * <p>
+ * 简单任务线程工厂，用于创建执行器的线程。
+ * 
  * @author fhanik
- *
  */
 public class TaskThreadFactory implements ThreadFactory {
+
+	/** 线程所在的线程组 */
     private final ThreadGroup group;
+    /** 线程计数，用于线程命名 */
     private final AtomicInteger threadNumber = new AtomicInteger(1);
+    /** 线程名称前缀 */
     private final String namePrefix;
+    /** 是否以"守护线程"方式运行 */
     private final boolean daemon;
+    /** 线程优先级 */
     private final int threadPriority;
+    
     public TaskThreadFactory(String namePrefix, boolean daemon, int priority) {
         SecurityManager s = System.getSecurityManager();
         group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
@@ -37,6 +46,10 @@ public class TaskThreadFactory implements ThreadFactory {
         this.threadPriority = priority;
     }
 
+    /**
+     * 创建一个新的任务线程。<br>
+     * {@inheritDoc}
+     */
     @Override
     public Thread newThread(Runnable r) {
         TaskThread t = new TaskThread(group, r, namePrefix + threadNumber.getAndIncrement());
