@@ -17,6 +17,7 @@
 
 # -----------------------------------------------------------------------------
 # Start Script for the CATALINA Server
+# CATALINA服务器的启动脚本
 # -----------------------------------------------------------------------------
 
 # Better OS/400 detection: see Bugzilla 31132
@@ -24,8 +25,11 @@ os400=false
 case "`uname`" in
 OS400*) os400=true;;
 esac
+# `uname`：Linux  (在Ubuntu系统中执行结果)
+# `uname` 等价于 `uname -s`，输出内核名称
 
-# resolve links - $0 may be a softlink
+# resolve links - $0 may be a softlink  (解析链接 - $0 可能是一个“软链接”)
+# 执行程序
 PRG="$0"
 
 while [ -h "$PRG" ] ; do
@@ -38,7 +42,9 @@ while [ -h "$PRG" ] ; do
   fi
 done
 
+# 执行程序所在的根目录
 PRGDIR=`dirname "$PRG"`
+# 可执行的脚本文件
 EXECUTABLE=catalina.sh
 
 # Check that target executable exists
@@ -49,6 +55,7 @@ if $os400; then
   # this will not work if the user belongs in secondary groups
   eval
 else
+  # “可执行的脚本文件”是否拥有“执行”权限
   if [ ! -x "$PRGDIR"/"$EXECUTABLE" ]; then
     echo "Cannot find $PRGDIR/$EXECUTABLE"
     echo "The file is absent or does not have execute permission"
@@ -57,4 +64,5 @@ else
   fi
 fi
 
+# 启动“CATALINA服务器”
 exec "$PRGDIR"/"$EXECUTABLE" start "$@"
