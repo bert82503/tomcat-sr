@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -21,6 +21,13 @@
                       http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
   version="3.0">
 
+  <!-- ============================ 介绍 ================================== -->
+  <!-- 本文档定义了装载到Tomcat实例的所有Web应用程序的默认值。              -->
+  <!-- 当每个应用程序被部署时，其"/WEB-INF/web.xml"部署描述符会被处理。     -->
+  <!--                                                                      -->
+  <!-- 警告：不要在此文件配置应用程序特定的资源！（全局部署描述符）         -->
+  <!-- 应用程序的资源应该在你的应用程序的"/WEB-INF/web.xml"文件中配置。     -->
+  <!--                                                                      -->
   <!-- ======================== Introduction ============================== -->
   <!-- This document defines default values for *all* web applications      -->
   <!-- loaded into this instance of Tomcat.  As each application is         -->
@@ -32,8 +39,12 @@
   <!-- They should go in the "/WEB-INF/web.xml" file in your application.   -->
 
 
+  <!-- ======================= 内置的Servlet定义 ========================== -->
   <!-- ================== Built In Servlet Definitions ==================== -->
 
+  <!-- 所有Web应用程序的默认servlet，其提供静态资源。                       -->
+  <!-- 它结合servlet映射来处理未映射到其他servlets的所有请求（servlet映射可以定义在此文件，也可以定义在你应用程序的web.xml文件里）。 -->
+  <!-- 本servlet支持以下这些初始化参数（默认值是在方括号中）：              -->
 
   <!-- The default servlet for all web applications, that serves static     -->
   <!-- resources.  It processes all requests that are not mapped to other   -->
@@ -42,13 +53,13 @@
   <!-- parameters (default values are in square brackets):                  -->
   <!--                                                                      -->
   <!--   debug               Debugging detail level for messages logged     -->
-  <!--                       by this servlet.  [0]                          -->
+  <!--                       by this servlet.  [0]  调试消息记录的详细级别  -->
   <!--                                                                      -->
   <!--   fileEncoding        Encoding to be used to read static resources   -->
-  <!--                       [platform default]                             -->
+  <!--                       [platform default]  静态资源的编码方式         -->
   <!--                                                                      -->
   <!--   input               Input buffer size (in bytes) when reading      -->
-  <!--                       resources to be served.  [2048]                -->
+  <!--                       resources to be served.  [2048] 输入缓冲区大小 -->
   <!--                                                                      -->
   <!--   listings            Should directory listings be produced if there -->
   <!--                       is no welcome file in this directory?  [false] -->
@@ -57,11 +68,12 @@
   <!--                       significant proportions of server resources.   -->
   <!--                                                                      -->
   <!--   output              Output buffer size (in bytes) when writing     -->
-  <!--                       resources to be served.  [2048]                -->
+  <!--                       resources to be served.  [2048] 输出缓冲区大小 -->
   <!--                                                                      -->
   <!--   readonly            Is this context "read only", so HTTP           -->
   <!--                       commands like PUT and DELETE are               -->
   <!--                       rejected?  [true]                              -->
+  <!--                       本上下文是否“只读”，PUT和DELETE都被拒绝吗？  -->
   <!--                                                                      -->
   <!--   readmeFile          File to display together with the directory    -->
   <!--                       contents. [null]                               -->
@@ -99,6 +111,7 @@
   <!--                       response sent to clients when directory        -->
   <!--                       listings is enabled? [true]                    -->
 
+    <!-- 默认的Servlet，基于HttpServlet实现 -->
     <servlet>
         <servlet-name>default</servlet-name>
         <servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class>
@@ -119,8 +132,10 @@
   <!-- is mapped to the URL pattern "*.jsp".  This servlet supports the     -->
   <!-- following initialization parameters (default values are in square    -->
   <!-- brackets):                                                           -->
+  <!-- JSP页面编译器并执行Servlet，这是Tomcat为了支持JSP页面使用的机制。    -->
+  <!-- 传统上，这个Servlet被映射到"*.jsp" URL模式。                         -->
   <!--                                                                      -->
-  <!--   checkInterval       If development is false and checkInterval is   -->
+  <!--   checkInterval       If development is false and checkInterval is   --> 如果处于非开发模式且checkInterval值大于0，则后台编译程序被启动。
   <!--                       greater than zero, background compilations are -->
   <!--                       enabled. checkInterval is the time in seconds  -->
   <!--                       between checks to see if a JSP page (and its   -->
@@ -133,13 +148,13 @@
   <!--                       generated servlets?  [Created dynamically      -->
   <!--                       based on the current web application]          -->
   <!--                                                                      -->
-  <!--   compiler            Which compiler Ant should use to compile JSP   -->
+  <!--   compiler            Which compiler Ant should use to compile JSP   --> Ant编译器应该用于编译JSP页面
   <!--                       pages.  See the jasper documentation for more  -->
   <!--                       information.                                   -->
   <!--                                                                      -->
-  <!--   compilerSourceVM    Compiler source VM. [1.6]                      -->
+  <!--   compilerSourceVM    Compiler source VM. [1.6]                      --> 编译器源VM版本
   <!--                                                                      -->
-  <!--   compilerTargetVM    Compiler target VM. [1.6]                      -->
+  <!--   compilerTargetVM    Compiler target VM. [1.6]                      --> 编译器目标VM版本
   <!--                                                                      -->
   <!--   development         Is Jasper used in development mode? If true,   -->
   <!--                       the frequency at which JSPs are checked for    -->
@@ -154,7 +169,7 @@
   <!--                       dumped to a file? [false]                      -->
   <!--                       False if suppressSmap is true                  -->
   <!--                                                                      -->
-  <!--   enablePooling       Determines whether tag handler pooling is      -->
+  <!--   enablePooling       Determines whether tag handler pooling is      --> 标签处理器连接池是否
   <!--                       enabled. This is a compilation option. It will -->
   <!--                       not alter the behaviour of JSPs that have      -->
   <!--                       already been compiled. [true]                  -->
@@ -181,7 +196,7 @@
   <!--                       Explorer when using <jsp:plugin> tags.         -->
   <!--                       [clsid:8AD9C840-044E-11D1-B3E9-00805F499D93]   -->
   <!--                                                                      -->
-  <!--   javaEncoding        Java file encoding to use for generating java  -->
+  <!--   javaEncoding        Java file encoding to use for generating java  --> Java文件编码
   <!--                       source files. [UTF8]                           -->
   <!--                                                                      -->
   <!--   keepgenerated       Should we keep the generated Java source code  -->
@@ -233,6 +248,7 @@
   <!--   xpoweredBy          Determines whether X-Powered-By response       -->
   <!--                       header is added by generated servlet.  [false] -->
 
+    <!-- 处理JSP页面的Servlet，基于HttpServlet实现 -->
     <servlet>
         <servlet-name>jsp</servlet-name>
         <servlet-class>org.apache.jasper.servlet.JspServlet</servlet-class>
@@ -248,7 +264,7 @@
     </servlet>
 
 
-  <!-- NOTE: An SSI Filter is also available as an alternative SSI          -->
+  <!-- NOTE: An SSI Filter is also available as an alternative SSI          --> 一个SSI过滤器
   <!-- implementation. Use either the Servlet or the Filter but NOT both.   -->
   <!--                                                                      -->
   <!-- Server Side Includes processing servlet, which processes SSI         -->
@@ -353,21 +369,24 @@
 -->
 
 
+  <!-- ================   内建的Servlet映射规则   ========================= -->
   <!-- ================ Built In Servlet Mappings ========================= -->
 
 
-  <!-- The servlet mappings for the built in servlets defined above.  Note  -->
+  <!-- The servlet mappings for the built in servlets defined above.  Note  --> 基于上面定义的servlets而内建的Servlet映射规则列表
   <!-- that, by default, the CGI and SSI servlets are *not* mapped.  You    -->
-  <!-- must uncomment these mappings (or add them to your application's own -->
+  <!-- must uncomment these mappings (or add them to your application's own --> 增加他们到你应用程序的web.xml部署描述符
   <!-- web.xml deployment descriptor) to enable these services              -->
 
     <!-- The mapping for the default servlet -->
+    <!-- 默认Servlet的映射规则（匹配所有请求） -->
     <servlet-mapping>
         <servlet-name>default</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
 
     <!-- The mappings for the JSP servlet -->
+    <!-- JSP Servlet的映射规则 -->
     <servlet-mapping>
         <servlet-name>jsp</servlet-name>
         <url-pattern>*.jsp</url-pattern>
@@ -392,10 +411,12 @@
 -->
 
 
+  <!-- ==================     内建的过滤器定义列表    ===================== -->
   <!-- ================== Built In Filter Definitions ===================== -->
 
   <!-- A filter that sets character encoding that is used to decode -->
   <!-- parameters in a POST request -->
+  <!-- 设置字符编码的过滤器，用来解码 POST 请求的参数 -->
 <!--
     <filter>
         <filter-name>setCharacterEncodingFilter</filter-name>
@@ -411,6 +432,7 @@
   <!-- A filter that triggers request parameters parsing and rejects the    -->
   <!-- request if some parameters were skipped because of parsing errors or -->
   <!-- request size limitations.                                            -->
+  <!-- 触发请求参数解析的过滤器，若某些参数被忽略而引起拒绝请求，是因为解析错误或请求大小限制 -->
 <!--
     <filter>
         <filter-name>failedRequestFilter</filter-name>
@@ -480,9 +502,11 @@
 -->
 
 
+  <!-- ==================== 内建的过滤器映射规则列表 ====================== -->
   <!-- ==================== Built In Filter Mappings ====================== -->
 
   <!-- The mapping for the Set Character Encoding Filter -->
+  <!-- 设置字符编码过滤器的映射规则（匹配所有请求） -->
 <!--
     <filter-mapping>
         <filter-name>setCharacterEncodingFilter</filter-name>
@@ -491,6 +515,7 @@
 -->
 
   <!-- The mapping for the Failed Request Filter -->
+  <!-- 失败请求过滤器的映射规则（匹配所有请求） -->
 <!--
     <filter-mapping>
         <filter-name>failedRequestFilter</filter-name>
@@ -507,21 +532,26 @@
 -->
 
 
+  <!-- ====================   会话（Session）的默认配置   ================= -->
   <!-- ==================== Default Session Configuration ================= -->
   <!-- You can set the default session timeout (in minutes) for all newly   -->
   <!-- created sessions by modifying the value below.                       -->
+  <!-- 为所有新创建的会话设置默认的会话超时时间（默认是30“分钟”）         -->
 
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
 
 
+  <!-- ===================== MIME类型的默认映射规则列表 =================== -->
   <!-- ===================== Default MIME Type Mappings =================== -->
   <!-- When serving static resources, Tomcat will automatically generate    -->
   <!-- a "Content-Type" header based on the resource's filename extension,  -->
   <!-- based on these mappings.  Additional mappings can be added here (to  -->
   <!-- apply to all web applications), or in your own application's web.xml -->
   <!-- deployment descriptor.                                               -->
+  <!-- 当提供静态资源时，Tomcat会基于资源的文件名扩展自动生成一个“内容-类型”头信息 -->
+  <!-- 其他的映射规则可以添加到你应用程序的web.xml部署描述符中              -->
 
     <mime-mapping>
         <extension>123</extension>
@@ -647,6 +677,7 @@
         <extension>anx</extension>
         <mime-type>application/annodex</mime-type>
     </mime-mapping>
+    <!-- Android应用程序 -->
     <mime-mapping>
         <extension>apk</extension>
         <mime-type>application/vnd.android.package-archive</mime-type>
@@ -695,6 +726,7 @@
         <extension>atc</extension>
         <mime-type>application/vnd.acucorp</mime-type>
     </mime-mapping>
+    <!-- Atom订阅 -->
     <mime-mapping>
         <extension>atom</extension>
         <mime-type>application/atom+xml</mime-type>
@@ -771,6 +803,7 @@
         <extension>bh2</extension>
         <mime-type>application/vnd.fujitsu.oasysprs</mime-type>
     </mime-mapping>
+    <!-- 字节流 -->
     <mime-mapping>
         <extension>bin</extension>
         <mime-type>application/octet-stream</mime-type>
@@ -1979,6 +2012,7 @@
         <extension>jpe</extension>
         <mime-type>image/jpeg</mime-type>
     </mime-mapping>
+    <!-- JPEG格式图片 -->
     <mime-mapping>
         <extension>jpeg</extension>
         <mime-type>image/jpeg</mime-type>
@@ -2007,6 +2041,7 @@
         <extension>jsf</extension>
         <mime-type>text/plain</mime-type>
     </mime-mapping>
+    <!-- JSON -->
     <mime-mapping>
         <extension>json</extension>
         <mime-type>application/json</mime-type>
@@ -2135,6 +2170,7 @@
         <extension>lnk</extension>
         <mime-type>application/x-ms-shortcut</mime-type>
     </mime-mapping>
+    <!-- Log日志文件 -->
     <mime-mapping>
         <extension>log</extension>
         <mime-type>text/plain</mime-type>
@@ -4590,6 +4626,7 @@
         <mime-type>application/vnd.handheld-entertainment+xml</mime-type>
     </mime-mapping>
 
+  <!-- ====================    默认的欢迎文件列表     ===================== -->
   <!-- ==================== Default Welcome File List ===================== -->
   <!-- When a request URI refers to a directory, the default servlet looks  -->
   <!-- for a "welcome file" within that directory and, if present, to the   -->
@@ -4602,7 +4639,12 @@
   <!-- If you define welcome files in your own application's web.xml        -->
   <!-- deployment descriptor, that list *replaces* the list configured      -->
   <!-- here, so be sure to include any of the default values that you wish  -->
-  <!-- to use within your application.                                       -->
+  <!-- to use within your application.                                      -->
+
+  <!-- 当请求URI指向目录时，默认的Servlet会查找该目录下的“欢迎文件”。     -->
+  <!-- 如果欢迎文件不存在，默认的Servlet可能提供一个目录列表或者返回一个404状态。 -->
+  <!--                                                                      -->
+  <!-- 如果在你的应用程序的web.xml部署描述符中定义欢迎文件列表，罗列被替换的列表。 -->
 
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
